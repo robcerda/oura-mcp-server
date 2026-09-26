@@ -168,6 +168,17 @@ async def test_check_auth_status_reports_without_leaking_tokens(isolated):
         assert secret not in text
 
 
+async def test_check_auth_status_understands_prefixed_scopes(isolated):
+    """Oura's token response reports scopes as 'extapi:<name>'."""
+    isolated.save(make_session(scope="extapi:daily extapi:personal"))
+
+    result = await call_tool("check_auth_status", {})
+
+    assert result["scopes_granted"] == ["daily", "personal"]
+    assert "daily" not in result["scopes_missing"]
+    assert "heartrate" in result["scopes_missing"]
+
+
 async def test_check_auth_status_signed_out():
     result = await call_tool("check_auth_status", {})
 

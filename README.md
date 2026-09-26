@@ -218,7 +218,7 @@ CLI flags override their environment settings.
 
 **"Not signed in to Oura"**: run `uv run python login_setup.py`, then retry. Restart the client if it still says so.
 
-**403 on one tool**: that data type's scope was unticked on Oura's consent screen, or it needs hardware you do not have (SpO2 needs a Gen 3 ring or later). `check_auth_status` lists the granted and missing scopes. Sign in again and grant it.
+**401 or 403 mentioning a scope on one tool**: that data type's scope was unticked on Oura's consent screen, or was granted before this server requested it (resilience needs `stress`, which sessions created before it was added lack), or it needs hardware you do not have (SpO2 needs a Gen 3 ring or later). `check_auth_status` lists the granted and missing scopes. Sign in again and grant it.
 
 **"Oura rejected the stored refresh token"**: the session was revoked (for example by removing the app's access in your Oura account). Sign in again.
 

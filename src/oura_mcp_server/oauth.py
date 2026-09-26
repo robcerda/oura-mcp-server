@@ -31,6 +31,9 @@ ALL_SCOPES = (
     "session",
     "spo2",
     "heart_health",
+    # Not in the published spec, but daily_resilience answers "Token is not
+    # authorized access stress scope." without it.
+    "stress",
 )
 
 # Used when a token response leaves out expires_in. Oura documents access

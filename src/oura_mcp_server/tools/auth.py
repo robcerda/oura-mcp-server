@@ -55,7 +55,8 @@ async def check_auth_status() -> Dict[str, Any]:
             "next_step": "Run `uv run python login_setup.py` (see setup_authentication).",
         }
 
-    granted = session.scope.split()
+    # Oura reports scopes with a prefix ("extapi:daily") but requests them bare.
+    granted = [s.removeprefix("extapi:") for s in session.scope.split()]
     remaining = int(session.expires_at - time.time())
     return {
         "mode": "live",

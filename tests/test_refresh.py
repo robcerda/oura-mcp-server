@@ -43,9 +43,7 @@ async def test_expired_token_is_refreshed_before_the_request(oura, expired, isol
     assert stored.expires_at > time.time() + 80000
 
 
-async def test_a_refresh_response_without_refresh_token_keeps_the_old_one(
-    oura, expired, isolated
-):
+async def test_a_refresh_response_without_refresh_token_keeps_the_old_one(oura, expired, isolated):
     body = token_body(2)
     del body["refresh_token"]
     oura.json("/oauth/token", body)
@@ -133,3 +131,14 @@ async def test_token_endpoint_outage_is_reported(oura, expired):
 
     with pytest.raises(ToolError, match="Could not refresh the Oura session"):
         await call_tool("get_daily_sleep", {})
+
+
+async def test_missing_scope_401_does_not_spend_the_refresh_token(oura, signed_in):
+    """Oura reports a missing scope as 401; refreshing cannot fix that."""
+    body = {"detail": "Token is not authorized access stress scope."}
+    oura.json("/daily_resilience", body, 401)
+
+    with pytest.raises(ToolError, match="lacks the scope"):
+        await call_tool("get_daily_resilience", {})
+    assert oura.to("/oauth/token") == []
+    assert len(oura.to("/daily_resilience")) == 1

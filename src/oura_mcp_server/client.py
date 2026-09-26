@@ -168,19 +168,38 @@ def _validation_detail(body: Any) -> Optional[str]:
     return None
 
 
+def _missing_scope(response: httpx.Response) -> bool:
+    """Whether a 401 means the token lacks a scope rather than being invalid.
+
+    Oura answers a missing scope with 401 and a body such as "Token is not
+    authorized access stress scope.", not the 403 its docs describe.
+    Refreshing cannot fix that, and each refresh spends the refresh token.
+    """
+    try:
+        detail = _validation_detail(response.json())
+    except ValueError:
+        return False
+    return response.status_code == 401 and bool(detail) and "scope" in detail.lower()
+
+
+_SCOPE_HINT = (
+    "The session lacks the scope this data needs (it was unticked on "
+    "Oura's consent screen), or the Oura membership has lapsed. Re-run "
+    "login_setup.py and grant it."
+)
+
+
 def error_message(response: httpx.Response) -> str:
     """Build a readable error from an Oura error response."""
     try:
         detail = _validation_detail(response.json()) or response.text
     except ValueError:
         detail = response.text or response.reason_phrase
+    if _missing_scope(response):
+        return f"Oura API error {response.status_code}: {detail} ({_SCOPE_HINT})"
     hints = {
         401: "Run `uv run python login_setup.py` to sign in again.",
-        403: (
-            "The session lacks the scope this data needs (it was unticked on "
-            "Oura's consent screen), or the Oura membership has lapsed. Re-run "
-            "login_setup.py and grant it."
-        ),
+        403: _SCOPE_HINT,
         429: (
             "Oura rate limit reached"
             + (
@@ -207,8 +226,9 @@ async def oura_get(path: str, params: Optional[Dict[str, Any]] = None) -> Any:
     """GET *path* under the user collection and return the JSON body.
 
     None values are dropped from params. A 401 triggers one token refresh and
-    retry. Rate limited requests (429) are retried, honouring Retry-After.
-    Any other non-2xx response raises OuraError with the API's message.
+    retry, unless it says a scope is missing. Rate limited requests (429) are
+    retried, honouring Retry-After. Any other non-2xx response raises
+    OuraError with the API's message.
     """
     client = get_http_client()
     url = (SANDBOX_PATH if sandbox() else USER_PATH) + path
@@ -227,7 +247,12 @@ async def oura_get(path: str, params: Optional[Dict[str, Any]] = None) -> Any:
         except httpx.HTTPError as e:
             raise OuraError(f"Could not reach Oura: {e}") from e
 
-        if response.status_code == 401 and not refreshed and not sandbox():
+        if (
+            response.status_code == 401
+            and not refreshed
+            and not sandbox()
+            and not _missing_scope(response)
+        ):
             # The recorded expiry can be wrong (revoked early, clock skew).
             refreshed = True
             token = await access_token(force_refresh=True)
