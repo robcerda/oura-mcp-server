@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environment
+.venv
+venv/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Credentials. The session normally lives in the keyring or ~/.oura-mcp-server,
+# never in the checkout, but .env is where people put OURA_CLIENT_SECRET.
+.env*
+!.env.example
+session.json
+.oura-mcp-server/
