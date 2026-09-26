@@ -4,7 +4,7 @@ A Model Context Protocol (MCP) server for the [Oura Ring API v2](https://cloud.o
 
 Everything here reads. There are no tools that change anything in your Oura account.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Register an Oura API application
 
@@ -93,7 +93,7 @@ Set `OURA_MCP_SANDBOX=1` in the server's environment and every tool reads Oura's
 "env": { "OURA_MCP_SANDBOX": "1" }
 ```
 
-## 🛠️ Available Tools
+## Available Tools
 
 All 22 registered tools. Optional parameters are marked with a trailing question mark. The table is checked against the live tool registry and the functions' signatures by `tests/test_readme_tool_reference.py`, so it does not drift.
 
@@ -137,7 +137,7 @@ Two prompts are also registered: `weekly_health_review` and `sleep_deep_dive`.
 
 Oura only has what the ring has synced. Sleep, readiness and bedtime recommendations appear after you open the Oura app in the morning; activity, stress and heart rate sync in the background through the day. Today's sleep missing is almost always a sync that has not happened yet.
 
-## 📝 Usage Examples
+## Usage Examples
 
 ```
 How has my sleep been over the last two weeks?
@@ -214,7 +214,7 @@ CLI flags override their environment settings.
 | `OURA_MCP_REDIRECT_URI`                   | Redirect URI for sign in, if not `http://localhost:8765/callback`           |
 | `OURA_MCP_SESSION_DIR`                    | Directory for the file fallback (default `~/.oura-mcp-server`)             |
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 **"Not signed in to Oura"**: run `uv run python login_setup.py`, then retry. Restart the client if it still says so.
 
@@ -228,7 +228,7 @@ CLI flags override their environment settings.
 
 **Today's data is missing**: open the Oura app to sync the ring. See [Data freshness](#data-freshness).
 
-## 🏗️ Technical Details
+## Technical Details
 
 ### Project Structure
 
@@ -262,7 +262,7 @@ oura-mcp-server/
 - All tools are read only. The webhook subscription API is not exposed: it needs a public HTTPS endpoint and writes to your application's configuration.
 - The server requests every read scope Oura offers. You choose what to actually grant on the consent screen.
 
-## 🧪 Development
+## Development
 
 ```bash
 uv sync --locked --extra dev
@@ -277,6 +277,6 @@ uv export --frozen --no-emit-project --no-editable --no-dev \
   --format requirements-txt --output-file requirements-lock.txt
 ```
 
-## 📄 License
+## License
 
 MIT
