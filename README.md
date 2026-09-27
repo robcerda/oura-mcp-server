@@ -214,6 +214,25 @@ CLI flags override their environment settings.
 | `OURA_MCP_REDIRECT_URI`                   | Redirect URI for sign in, if not `http://localhost:8765/callback`           |
 | `OURA_MCP_SESSION_DIR`                    | Directory for the file fallback (default `~/.oura-mcp-server`)             |
 
+## Meta Muse
+
+Works great with Meta Muse, Meta's AI assistant, alongside Claude Desktop and
+Claude Code. Muse speaks MCP, so it connects the same way as any other client:
+give it the stdio launch command from the installation section, or point it at
+the Streamable HTTP endpoint if you are running the container.
+
+Using Muse? Ask it to install this server from this repo. Muse can handle the
+install and register the server with itself, but signing in to Oura is a step
+only you can do: run login_setup.py once and approve access in your browser.
+After that, ask Muse how you slept last night to confirm it is working.
+
+Check out Muse, your personal AI agent. Redeem my code in Settings within 48
+hours of joining and we'll both get 1 billion Muse tokens.
+
+Code: O63W0U
+
+https://muse.ai/join
+
 ## Troubleshooting
 
 **"Not signed in to Oura"**: run `uv run python login_setup.py`, then retry. Restart the client if it still says so.
